@@ -258,10 +258,10 @@ skynet_start(struct skynet_config * config) {
 			exit(1);
 		}
 	}
-	skynet_harbor_init(config->harbor);
-	skynet_handle_init(config->harbor);
-	skynet_mq_init();
-	skynet_module_init(config->module_path);
+	skynet_harbor_init(config->harbor);//将config->harbor左移24位后赋值给全局变量HARBOR
+	skynet_handle_init(config->harbor);//初始化全局变量H,config->harbor的低8位左移24位后作赋值给H->harbor
+	skynet_mq_init();//初始化全局变量Q,global_queue
+	skynet_module_init(config->module_path);//初始化全局变量M
 	skynet_timer_init();
 	skynet_socket_init();
 	skynet_profile_enable(config->profile);

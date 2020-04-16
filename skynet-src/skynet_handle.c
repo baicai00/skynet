@@ -19,9 +19,9 @@ struct handle_name {
 struct handle_storage {
 	struct rwlock lock;
 
-	uint32_t harbor;
-	uint32_t handle_index;
-	int slot_size;
+	uint32_t harbor;//假如配制项harbor的值为A,则harbor=(A & 0xff) << 24
+	uint32_t handle_index;//初始值为1,表示slot数组当前可使用的最小下标
+	int slot_size;//初始值为4,之后以slot_size*2的速度增长,最大值为0xffffff
 	struct skynet_context ** slot;
 	
 	int name_cap;
@@ -32,7 +32,7 @@ struct handle_storage {
 static struct handle_storage *H = NULL;
 
 uint32_t
-skynet_handle_register(struct skynet_context *ctx) {
+skynet_handle_register(struct skynet_context *ctx) {//将ctx注册到H->ctx[x],返回(x|H->harbor),即返回值的高8位为harbor,低24位为数组下标handle
 	struct handle_storage *s = H;
 
 	rwlock_wlock(&s->lock);

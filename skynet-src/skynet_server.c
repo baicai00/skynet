@@ -41,22 +41,22 @@
 #endif
 
 struct skynet_context {
-	void * instance;
-	struct skynet_module * mod;
-	void * cb_ud;
-	skynet_cb cb;
+	void * instance;//模块的XX_create函数的返回值,例如模块snlua.so(service_snlua.c),则对应snlua_create
+	struct skynet_module * mod;//模块,对应全局变量M->m数组的成员(其中全局变量M在skynet_module.c中)
+	void * cb_ud;//回调函数cb的第二个参数,cb_ud一般是在XX_create中分配内存,并作为返回值返回,然后在XX_init中调用skynet_callback设置
+	skynet_cb cb;//模块设置的消息回调函数,一般在模块的XX_init函数中设置,例如模块snlua.so,则在snlua_init中调用skynet_callback设置cb
 	struct message_queue *queue;
 	FILE * logfile;
 	uint64_t cpu_cost;	// in microsec
 	uint64_t cpu_start;	// in microsec
 	char result[32];
-	uint32_t handle;
+	uint32_t handle;//高8位为配制项harbor的第一个字节,低24位用于计算handle_storage::slot数组的下标
 	int session_id;
 	int ref;
 	int message_count;
 	bool init;
 	bool endless;
-	bool profile;
+	bool profile;//对应配制中的profile,为true时统计每个服务使用了多少cpu时间
 
 	CHECKCALLING_DECL
 };
@@ -124,12 +124,12 @@ drop_message(struct skynet_message *msg, void *ud) {
 
 struct skynet_context * 
 skynet_context_new(const char * name, const char *param) {
-	struct skynet_module * mod = skynet_module_query(name);
+	struct skynet_module * mod = skynet_module_query(name);//在全局变量M中查找name指定的模块并返回;如果该模块未找到则加载至内存中,模块即SO文件
 
 	if (mod == NULL)
 		return NULL;
 
-	void *inst = skynet_module_instance_create(mod);
+	void *inst = skynet_module_instance_create(mod);//如果模块有create函数,则调用
 	if (inst == NULL)
 		return NULL;
 	struct skynet_context * ctx = skynet_malloc(sizeof(*ctx));
@@ -153,19 +153,19 @@ skynet_context_new(const char * name, const char *param) {
 	// Should set to 0 first to avoid skynet_handle_retireall get an uninitialized handle
 	ctx->handle = 0;	
 	ctx->handle = skynet_handle_register(ctx);
-	struct message_queue * queue = ctx->queue = skynet_mq_create(ctx->handle);
+	struct message_queue * queue = ctx->queue = skynet_mq_create(ctx->handle);//创建消息队列
 	// init function maybe use ctx->handle, so it must init at last
 	context_inc();
 
 	CHECKCALLING_BEGIN(ctx)
-	int r = skynet_module_instance_init(mod, inst, ctx, param);
+	int r = skynet_module_instance_init(mod, inst, ctx, param);//调用模块的init函数
 	CHECKCALLING_END(ctx)
 	if (r == 0) {
 		struct skynet_context * ret = skynet_context_release(ctx);
 		if (ret) {
 			ctx->init = true;
 		}
-		skynet_globalmq_push(queue);
+		skynet_globalmq_push(queue);//将消息队列添加到全局消息队列Q的尾部
 		if (ret) {
 			skynet_error(ret, "LAUNCH %s %s", name, param ? param : "");
 		}
@@ -480,7 +480,7 @@ cmd_kill(struct skynet_context * context, const char * param) {
 }
 
 static const char *
-cmd_launch(struct skynet_context * context, const char * param) {
+cmd_launch(struct skynet_context * context, const char * param) {//param的形式一般为"snlua launcher",该函数通过snlua模块运行launcher.lua脚本,返回handle的十六进制字符串
 	size_t sz = strlen(param);
 	char tmp[sz+1];
 	strcpy(tmp,param);

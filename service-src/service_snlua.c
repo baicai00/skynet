@@ -76,16 +76,16 @@ static int
 init_cb(struct snlua *l, struct skynet_context *ctx, const char * args, size_t sz) {
 	lua_State *L = l->L;
 	l->ctx = ctx;
-	lua_gc(L, LUA_GCSTOP, 0);
+	lua_gc(L, LUA_GCSTOP, 0);//暂停Lua GC
 	lua_pushboolean(L, 1);  /* signal for libraries to ignore env. vars. */
-	lua_setfield(L, LUA_REGISTRYINDEX, "LUA_NOENV");
+	lua_setfield(L, LUA_REGISTRYINDEX, "LUA_NOENV");//设置REG["LUA_NOENV"]=1,其中REG为索引为LUA_REGISTRYINDEX的表
 	luaL_openlibs(L);
 	lua_pushlightuserdata(L, ctx);
-	lua_setfield(L, LUA_REGISTRYINDEX, "skynet_context");
-	luaL_requiref(L, "skynet.codecache", codecache , 0);
+	lua_setfield(L, LUA_REGISTRYINDEX, "skynet_context");//设置REG["skynet_context"]=ctx
+	luaL_requiref(L, "skynet.codecache", codecache , 0);//如果skynet.codecache未加载,则调用codecache加载(类似于调用require)
 	lua_pop(L,1);
 
-	const char *path = optstring(ctx, "lua_path","./lualib/?.lua;./lualib/?/init.lua");
+	const char *path = optstring(ctx, "lua_path","./lualib/?.lua;./lualib/?/init.lua");//返回配制项"lua_path"的值,如果该配制未设置,则返回参数三
 	lua_pushstring(L, path);
 	lua_setglobal(L, "LUA_PATH");
 	const char *cpath = optstring(ctx, "lua_cpath","./luaclib/?.so");
@@ -103,14 +103,14 @@ init_cb(struct snlua *l, struct skynet_context *ctx, const char * args, size_t s
 
 	const char * loader = optstring(ctx, "lualoader", "./lualib/loader.lua");
 
-	int r = luaL_loadfile(L,loader);
+	int r = luaL_loadfile(L,loader);//在这里加载loader.lua脚本
 	if (r != LUA_OK) {
 		skynet_error(ctx, "Can't load %s : %s", loader, lua_tostring(L, -1));
 		report_launcher_error(ctx);
 		return 1;
 	}
 	lua_pushlstring(L, args, sz);
-	r = lua_pcall(L,1,0,1);
+	r = lua_pcall(L,1,0,1);//运行loader.lua脚本,传入的参数args就是需要启动的脚本,通过loader.lua启动args指定的脚本
 	if (r != LUA_OK) {
 		skynet_error(ctx, "lua loader error : %s", lua_tostring(L, -1));
 		report_launcher_error(ctx);

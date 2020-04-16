@@ -9,8 +9,8 @@ typedef void (*skynet_dl_release)(void * inst);
 typedef void (*skynet_dl_signal)(void * inst, int signal);
 
 struct skynet_module {
-	const char * name;
-	void * module;
+	const char * name;  // 模块的名称,比如模块snlua.so的名称为snlua
+	void * module;      // 模块句柄,即dlopen的返回值
 	skynet_dl_create create;
 	skynet_dl_init init;
 	skynet_dl_release release;

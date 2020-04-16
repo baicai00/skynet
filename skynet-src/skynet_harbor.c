@@ -9,7 +9,7 @@
 #include <assert.h>
 
 static struct skynet_context * REMOTE = 0;
-static unsigned int HARBOR = ~0;
+static unsigned int HARBOR = ~0;//配制中的harbor(节点编号,取值范围1~255)左移24位后被赋值给HARBOR,即HARBOR的高8位保存harbor，其他位为零
 
 static inline int
 invalid_type(int type) {
@@ -25,7 +25,7 @@ skynet_harbor_send(struct remote_message *rmsg, uint32_t source, int session) {
 int 
 skynet_harbor_message_isremote(uint32_t handle) {
 	assert(HARBOR != ~0);
-	int h = (handle & ~HANDLE_MASK);
+	int h = (handle & ~HANDLE_MASK);//h的高8位为handle的高8位,其于位为零
 	return h != HARBOR && h !=0;
 }
 
