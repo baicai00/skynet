@@ -272,6 +272,8 @@ function skynet.wait(token)
 	session_id_coroutine[session] = nil
 end
 
+-- 获取服务自己的地址
+-- 服务的skynet_context->handle与lua层看到的服务地址addr关系是：sprintf(addr, ":%x", skynet_context->handle)
 function skynet.self()
 	return c.addresscommand "REG"
 end

@@ -232,7 +232,7 @@ get_dest_string(lua_State *L, int index) {
 static int
 send_message(lua_State *L, int source, int idx_type) {
 	struct skynet_context * context = lua_touserdata(L, lua_upvalueindex(1));
-	uint32_t dest = (uint32_t)lua_tointeger(L, 1);
+	uint32_t dest = (uint32_t)lua_tointeger(L, 1);// 如果lua_tointeger要转换的值不是数字或数字字符串,则该函数返回零
 	const char * dest_string = NULL;
 	if (dest == 0) {
 		if (lua_type(L,1) == LUA_TNUMBER) {
