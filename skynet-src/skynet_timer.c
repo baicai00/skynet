@@ -246,6 +246,7 @@ systime(uint32_t *sec, uint32_t *cs) {
 #endif
 }
 
+// 返回当前时间,以10毫秒为单位
 static uint64_t
 gettime() {
 	uint64_t t;

@@ -229,6 +229,11 @@ get_dest_string(lua_State *L, int index) {
 	return dest_string;
 }
 
+/*
+send_message目前在C代码中会被lredirect与lsend函数调用,在lua中通过调用skynet.core的redirect或send函数可以调用到send_message
+当该函数被lredirect调用时,source形参等于redirect的source参数,idx_type传入3,表示typename参数位置
+当该函数被lsend调用时,source形参等于0,idx_type传入2,表示typename参数位置
+*/
 static int
 send_message(lua_State *L, int source, int idx_type) {
 	struct skynet_context * context = lua_touserdata(L, lua_upvalueindex(1));
