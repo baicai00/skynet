@@ -55,7 +55,7 @@ sp_wait(int efd, struct event *e, int max) {
 	int n = epoll_wait(efd , ev, max, -1);
 	int i;
 	for (i=0;i<n;i++) {
-		e[i].s = ev[i].data.ptr;
+		e[i].s = ev[i].data.ptr;// ptr保存的是struct socket *类型(在socket_server.c的new_fd中赋值)
 		unsigned flag = ev[i].events;
 		e[i].write = (flag & EPOLLOUT) != 0;
 		e[i].read = (flag & (EPOLLIN | EPOLLHUP)) != 0;

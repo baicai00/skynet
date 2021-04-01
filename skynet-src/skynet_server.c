@@ -693,7 +693,7 @@ _filter_args(struct skynet_context * context, int type, int *session, void ** da
 		*data = msg;
 	}
 
-	*sz |= (size_t)type << MESSAGE_TYPE_SHIFT;
+	*sz |= (size_t)type << MESSAGE_TYPE_SHIFT;//sz的高8位用于存放type的高低8位
 }
 
 int

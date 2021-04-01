@@ -369,12 +369,12 @@ struct socket_server *
 socket_server_create(uint64_t time) {
 	int i;
 	int fd[2];
-	poll_fd efd = sp_create();
+	poll_fd efd = sp_create();// 这里使用的是epoll
 	if (sp_invalid(efd)) {
 		fprintf(stderr, "socket-server: create event pool failed.\n");
 		return NULL;
 	}
-	if (pipe(fd)) {
+	if (pipe(fd)) { // fd[0]为管道读取端的描述符,fd[1]为管道写入端的描述符.写入端写入的数据由内核缓存,直至被读取端读取
 		sp_release(efd);
 		fprintf(stderr, "socket-server: create socket pair failed.\n");
 		return NULL;
