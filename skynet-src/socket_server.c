@@ -109,10 +109,10 @@ struct socket {
 
 struct socket_server {
 	volatile uint64_t time;
-	int recvctrl_fd;
-	int sendctrl_fd;
-	int checkctrl;
-	poll_fd event_fd;
+	int recvctrl_fd; //管道接收端
+	int sendctrl_fd; //管道发送端
+	int checkctrl; //值为1表示检查控制指令,其中控制指令通过管道传输
+	poll_fd event_fd; //对于epoll模式,该成员是epoll_create的返回值
 	int alloc_id;
 	int event_n;
 	int event_index;
