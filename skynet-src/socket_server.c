@@ -114,10 +114,10 @@ struct socket_server {
 	int checkctrl; //值为1表示检查控制指令,其中控制指令通过管道传输
 	poll_fd event_fd; //对于epoll模式,该成员是epoll_create的返回值
 	int alloc_id;
-	int event_n;
-	int event_index;
+	int event_n; //对于epoll模式,该成员是epoll_wait的返回值
+	int event_index;//用于遍历ev数组的索引
 	struct socket_object_interface soi;
-	struct event ev[MAX_EVENT];
+	struct event ev[MAX_EVENT];//值来自于epoll_wait的events参数
 	struct socket slot[MAX_SOCKET];
 	char buffer[MAX_INFO];
 	uint8_t udpbuffer[MAX_UDP_PACKAGE];

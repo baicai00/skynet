@@ -10,10 +10,10 @@ local tremove = table.remove
 local tinsert = table.insert
 local traceback = debug.traceback
 
-local profile = require "skynet.profile"
+local profile = require "skynet.profile" --C接口，在lua-profile.c中实现
 
 local cresume = profile.resume
-local running_thread = nil
+local running_thread = nil --当前正在运行的协程ID
 local init_thread = nil
 
 local function coroutine_resume(co, ...)
@@ -54,8 +54,8 @@ function skynet.register_protocol(class)
 end
 
 local session_id_coroutine = {}
-local session_coroutine_id = {}
-local session_coroutine_address = {}
+local session_coroutine_id = {} -- 协程ID --> session
+local session_coroutine_address = {} -- 协程ID --> source handle(即消息发送者的handle)
 local session_coroutine_tracetag = {}
 local unresponse = {}
 

@@ -25,11 +25,11 @@ struct message_queue {
 	int head;
 	int tail;
 	int release;
-	int in_global;
+	int in_global;// 0表示该队列不在global_queue中，1表示该列在global_queue中
 	int overload;
 	int overload_threshold;
-	struct skynet_message *queue;
-	struct message_queue *next;
+	struct skynet_message *queue;//使用一维数组实现的队列，容量为cap；head为队首下标，tail为队尾下标（它指向的节点还未被使用）
+	struct message_queue *next;//当该队列在global_queue中时，指向global_queue的下一个节点
 };
 
 struct global_queue {
